@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "run-test1": "node src/test1/test1.js",
-    "run-test2": "node src/test2/test2.js"
+    "run-test2": "node src/test2/test2.js",
+    "run-sprint1": "node src/sprint1/sprint1.js"
   },
   "author": "",
   "license": "ISC",
