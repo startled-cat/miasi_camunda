@@ -16,32 +16,33 @@ const camundaResponses:any[] = [];
 //     logger
 // } = require('camunda-external-task-client-js');
 
+import {Client, logger} from 'camunda-external-task-client-js'
 
-// const config = {
-//     baseUrl: CAMUNDA_REST_URL,
-//     use: logger,
-//     asyncResponseTimeout: 10000
-// };
+const config = {
+    baseUrl: CAMUNDA_REST_URL,
+    use: logger,
+    asyncResponseTimeout: 10000
+};
 
-// const client = new Client(config);
+const client = new Client(config);
 
-// client.subscribe('response-positive', async function ({
-//     task,
-//     taskService
-// }) {
-//     console.log(`To dobrze`);
-//     camundaResponses.push({msg: "To dobrze", when: new Date().toISOString()});
-//     await taskService.complete(task);
-// });
+client.subscribe('response-positive', async function ({
+    task,
+    taskService
+}) {
+    console.log(`To dobrze`);
+    camundaResponses.push({msg: "To dobrze", when: new Date().toISOString()});
+    await taskService.complete(task);
+});
 
-// client.subscribe('response-negative', async function ({
-//     task,
-//     taskService
-// }) {
-//     console.log(`To źle`);
-//     camundaResponses.push({msg: "To źle", when: new Date().toISOString()});
-//     await taskService.complete(task);
-// });
+client.subscribe('response-negative', async function ({
+    task,
+    taskService
+}) {
+    console.log(`To źle`);
+    camundaResponses.push({msg: "To źle", when: new Date().toISOString()});
+    await taskService.complete(task);
+});
 
 
 
@@ -54,8 +55,9 @@ const camundaResponses:any[] = [];
 
 
 
+const PORT = 80;
+import express from 'express';
 
-const express = require('express');
 const app = express();
 const got = require('got');
 
@@ -103,11 +105,8 @@ app.post('/start', async (req: any, res: any) => {
 
 })
 
-app.use(express.static('src/sprint2/static'));
+app.use(express.static('./static'));
 
-const server = app.listen(80, function () {
-    const host = server.address().address;
-    const port = server.address().port;
-
-    console.log("Example app listening at http://%s:%s", host, port);
+const server = app.listen(PORT, function () {
+    console.log(`frontend listening at ${PORT}`);
 })

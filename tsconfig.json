@@ -1,12 +1,16 @@
 {
   "compilerOptions": {
+    "module": "commonjs",
+    "rootDir": "./src",
+    "outDir": "./dist",
     "allowJs": true,
     "checkJs": true,
-    "outDir": "dist",
     "sourceMap": true,
     "target": "ES6",
+
     "noImplicitAny": true,
     "noImplicitReturns": true,
+    "esModuleInterop": true,
     "strict": true
   },
   "exclude": [
