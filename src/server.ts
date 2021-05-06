@@ -8,13 +8,13 @@ const camundaRestResources = {
 // -------------------------------------------------
 // ------------ camunda service -------------
 // -------------------------------------------------
-const camundaResponses = [];
+const camundaResponses:any[] = [];
 
 const {
     Client,
     logger
 } = require('camunda-external-task-client-js');
-const open = require('open');
+
 
 const config = {
     baseUrl: CAMUNDA_REST_URL,
@@ -58,14 +58,14 @@ const express = require('express');
 const app = express();
 const got = require('got');
 
-app.get('/hello', function (req, res) {
+app.get('/hello', function (req: any, res: any) {
     res.send('Hello World');
 })
 
-app.get('/messages', (req, res) => {
+app.get('/messages', (req: any, res: any) => {
     res.send({messages : camundaResponses});
 })
-app.post('/start', async (req, res) => {
+app.post('/start', async (req: any, res: any) => {
     console.log('/start');
     let camundaStartProcessRequest = {
         "variables": {
