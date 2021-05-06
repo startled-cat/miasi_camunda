@@ -8,39 +8,40 @@ const camundaRestResources = {
 // -------------------------------------------------
 // ------------ camunda service -------------
 // -------------------------------------------------
+
 const camundaResponses:any[] = [];
 
-const {
-    Client,
-    logger
-} = require('camunda-external-task-client-js');
+// const {
+//     Client,
+//     logger
+// } = require('camunda-external-task-client-js');
 
 
-const config = {
-    baseUrl: CAMUNDA_REST_URL,
-    use: logger,
-    asyncResponseTimeout: 10000
-};
+// const config = {
+//     baseUrl: CAMUNDA_REST_URL,
+//     use: logger,
+//     asyncResponseTimeout: 10000
+// };
 
-const client = new Client(config);
+// const client = new Client(config);
 
-client.subscribe('response-positive', async function ({
-    task,
-    taskService
-}) {
-    console.log(`To dobrze`);
-    camundaResponses.push({msg: "To dobrze", when: new Date().toISOString()});
-    await taskService.complete(task);
-});
+// client.subscribe('response-positive', async function ({
+//     task,
+//     taskService
+// }) {
+//     console.log(`To dobrze`);
+//     camundaResponses.push({msg: "To dobrze", when: new Date().toISOString()});
+//     await taskService.complete(task);
+// });
 
-client.subscribe('response-negative', async function ({
-    task,
-    taskService
-}) {
-    console.log(`To źle`);
-    camundaResponses.push({msg: "To źle", when: new Date().toISOString()});
-    await taskService.complete(task);
-});
+// client.subscribe('response-negative', async function ({
+//     task,
+//     taskService
+// }) {
+//     console.log(`To źle`);
+//     camundaResponses.push({msg: "To źle", when: new Date().toISOString()});
+//     await taskService.complete(task);
+// });
 
 
 
