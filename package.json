@@ -6,12 +6,17 @@
   "scripts": {
     "test1": "node src/test1/test1.js",
     "test2": "node src/test2/test2.js",
-    "sprint1": "node src/sprint1/sprint1.js"
+    "sprint1": "node src/sprint1/sprint1.js",
+    "sprint2": "nodemon src/sprint2/server.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "camunda-external-task-client-js": "^2.1.0"
+    "body-parser": "^1.19.0",
+    "camunda-external-task-client-js": "^2.1.0",
+    "express": "^4.17.1",
+    "got": "^11.8.2",
+    "nodemon": "^2.0.7"
   },
   "devDependencies": {
     "open": "^8.0.7"
