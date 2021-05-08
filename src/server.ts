@@ -1,13 +1,7 @@
 const CAMUNDA_REST_URL = "http://localhost:8080/engine-rest";
-const CAMUNDA_PROCESS_NAME = "payment-retrival";
 
 const camundaRestResources = {
   message: CAMUNDA_REST_URL + "/message",
-  startProcess:
-    CAMUNDA_REST_URL +
-    "/process-definition/key/" +
-    CAMUNDA_PROCESS_NAME +
-    "/start",
 };
 
 // -------------------------------------------------
@@ -37,6 +31,9 @@ client.subscribe(
     const firstName: String = task.variables.get("firstName");
     const lastName: String = task.variables.get("lastName");
 
+    console.log(`Validating first name: "${firstName}"`);
+    console.log(`Validating last name: "${lastName}"`);
+
     if (firstName.length < 3 || lastName.length < 3)
       console.log("Error handling not implemented yet");
 
@@ -52,6 +49,9 @@ import express from "express";
 
 const app = express();
 const got = require("got");
+
+app.use(express.static("./static"));
+app.use(express.json());
 
 app.get("/hello", function (req: any, res: any) {
   res.send("Hello World");
@@ -79,7 +79,28 @@ app.get("/confirmCartContents", async (req: any, res: any) => {
   }
 });
 
-app.use(express.static("./static"));
+app.post("/submitClientData", async (req: any, res: any) => {
+  const payload = {
+    messageName: "clientDataMessage",
+    processInstanceId: req.body.id,
+    processVariables: {
+      firstName: { value: req.body.firstName, type: "String" },
+      lastName: { value: req.body.lastName, type: "String" },
+    },
+    resultEnabled: true,
+  };
+
+  try {
+    const response = await got(camundaRestResources.message, {
+      method: "POST",
+      json: payload,
+      responseType: "json",
+    });
+    res.send({});
+  } catch (error) {
+    res.status(500).send({});
+  }
+});
 
 const server = app.listen(PORT, function () {
   console.log(`frontend listening at ${PORT}`);

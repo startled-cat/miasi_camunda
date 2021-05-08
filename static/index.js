@@ -8,6 +8,7 @@ const shopUrl = "http://localhost:80/";
 
 const shopResources = {
   confirmCartContents: shopUrl + "confirmCartContents",
+  submitClientData: shopUrl + "submitClientData",
   messages: shopUrl + "messages",
 };
 
@@ -22,21 +23,26 @@ function onConfirmCartContents() {
     });
 }
 
-function onUserFormClick() {
-  console.log("onUserFormClick");
-  let form = {
-    response: document.getElementById("userform-response").checked,
+function onSubmitClientData(e) {
+  console.log("onSubmitClientData");
+  e.preventDefault();
+
+  const formData = new FormData(e.target);
+
+  const payload = {
+    id: localStorage.getItem("id"),
+    firstName: formData.get("firstName"),
+    lastName: formData.get("lastName"),
   };
 
-  fetch(shopResources.start, {
+  fetch(shopResources.submitClientData, {
     method: "POST",
-    body: JSON.stringify(form),
-    headers: {
-      "Content-type": "application/json; charset=UTF-8",
-    },
-  })
-    .then((response) => response.json())
-    .then((json) => console.log(json));
+    body: JSON.stringify(payload),
+    headers: { "Content-Type": "application/json" },
+  }).then(() => {
+    console.log("Success");
+    localStorage.removeItem("id");
+  });
 }
 
 function getMessages() {
