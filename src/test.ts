@@ -1,3 +1,2 @@
-
-let xd:string = "henlo";
+let xd: string = "henlo";
 console.log(xd);
