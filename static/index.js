@@ -7,9 +7,20 @@ window.addEventListener("load", () => {
 const shopUrl = "http://localhost:80/";
 
 const shopResources = {
-  start: shopUrl + "start",
+  confirmCartContents: shopUrl + "confirmCartContents",
   messages: shopUrl + "messages",
 };
+
+function onConfirmCartContents() {
+  console.log("onConfirmCartContents");
+
+  fetch(shopResources.confirmCartContents)
+    .then((response) => response.json())
+    .then((data) => {
+      localStorage.setItem("id", data.id);
+      console.log("Success");
+    });
+}
 
 function onUserFormClick() {
   console.log("onUserFormClick");

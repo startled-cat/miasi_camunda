@@ -2,6 +2,7 @@ const CAMUNDA_REST_URL = "http://localhost:8080/engine-rest";
 const CAMUNDA_PROCESS_NAME = "payment-retrival";
 
 const camundaRestResources = {
+  message: CAMUNDA_REST_URL + "/message",
   startProcess:
     CAMUNDA_REST_URL +
     "/process-definition/key/" +
@@ -59,39 +60,23 @@ app.get("/hello", function (req: any, res: any) {
 app.get("/messages", (req: any, res: any) => {
   res.send({ messages: camundaResponses });
 });
-app.post("/start", async (req: any, res: any) => {
-  console.log("/start");
-  let camundaStartProcessRequest = {
-    variables: {
-      amount: {
-        value: 555,
-        type: "long",
-      },
-      item: {
-        value: "item-xyz",
-      },
-      response: {
-        type: "boolean",
-        value: true,
-      },
-    },
+
+app.get("/confirmCartContents", async (req: any, res: any) => {
+  const payload = {
+    messageName: "newOrderMessage",
+    resultEnabled: true,
   };
 
   try {
-    const response = await got(camundaRestResources.startProcess, {
+    const response = await got(camundaRestResources.message, {
       method: "POST",
-      json: camundaStartProcessRequest,
+      json: payload,
+      responseType: "json",
     });
-    console.log(response.body);
-    res.send(response.body);
-    //=> '<!doctype html> ...'
+    res.send({ id: response.body[0].processInstance.id });
   } catch (error) {
-    console.log(error.response.body);
-    res.send(error.response.body);
-    //=> 'Internal server error ...'
+    res.status(500).send({ id: null });
   }
-
-  // now send post request with this body to camundaRestResources.startProcess
 });
 
 app.use(express.static("./static"));
