@@ -9,14 +9,14 @@ const camundaRestResources = {
 // ------------ camunda service -------------
 // -------------------------------------------------
 
-const camundaResponses:any[] = [];
+const camundaResponses: any[] = [];
 
 // const {
 //     Client,
 //     logger
 // } = require('camunda-external-task-client-js');
 
-import {Client, logger} from 'camunda-external-task-client-js'
+import { Client, logger } from 'camunda-external-task-client-js'
 
 const config = {
     baseUrl: CAMUNDA_REST_URL,
@@ -26,28 +26,19 @@ const config = {
 
 const client = new Client(config);
 
-client.subscribe('response-positive', async function ({
+client.subscribe('validate-client-data', async function ({
     task,
     taskService
 }) {
-    console.log(`To dobrze`);
-    camundaResponses.push({msg: "To dobrze", when: new Date().toISOString()});
+    const firstName: String = task.variables.get("firstName");
+    const lastName: String = task.variables.get("lastName");
+
+    if (firstName.length < 3 || lastName.length < 3)
+        console.log("Error handling not implemented yet");
+
+    // camundaResponses.push({ msg: "To dobrze", when: new Date().toISOString() });
     await taskService.complete(task);
 });
-
-client.subscribe('response-negative', async function ({
-    task,
-    taskService
-}) {
-    console.log(`To źle`);
-    camundaResponses.push({msg: "To źle", when: new Date().toISOString()});
-    await taskService.complete(task);
-});
-
-
-
-
-
 
 // -------------------------------------------------
 
@@ -66,7 +57,7 @@ app.get('/hello', function (req: any, res: any) {
 })
 
 app.get('/messages', (req: any, res: any) => {
-    res.send({messages : camundaResponses});
+    res.send({ messages: camundaResponses });
 })
 app.post('/start', async (req: any, res: any) => {
     console.log('/start');
@@ -80,7 +71,7 @@ app.post('/start', async (req: any, res: any) => {
                 "value": "item-xyz"
             },
             "response": {
-                "type" : "boolean",
+                "type": "boolean",
                 "value": true
             }
         }
