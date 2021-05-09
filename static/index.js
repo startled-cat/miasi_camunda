@@ -19,6 +19,7 @@ function onConfirmCartContents() {
     .then((response) => response.json())
     .then((data) => {
       localStorage.setItem("id", data.id);
+      document.getElementById('current-process-id').innerHTML = data.id;
       console.log("Success");
     });
 }

@@ -46,10 +46,12 @@ client.subscribe(
 
 const PORT = 80;
 import express from "express";
+import cors from 'cors';
 
 const app = express();
 const got = require("got");
 
+app.use(cors());
 app.use(express.static("./static"));
 app.use(express.json());
 
@@ -73,8 +75,11 @@ app.get("/confirmCartContents", async (req: any, res: any) => {
       json: payload,
       responseType: "json",
     });
-    res.send({ id: response.body[0].processInstance.id });
+    let newProcessId = response.body[0].processInstance.id;
+    console.log(`new process started, id = ${newProcessId}`);
+    res.send({ id: newProcessId });
   } catch (error) {
+    console.error('failed to start new process');
     res.status(500).send({ id: null });
   }
 });
@@ -96,8 +101,10 @@ app.post("/submitClientData", async (req: any, res: any) => {
       json: payload,
       responseType: "json",
     });
+    console.log('client data submitted');
     res.send({});
   } catch (error) {
+    console.error('failed to submit client data');
     res.status(500).send({});
   }
 });
