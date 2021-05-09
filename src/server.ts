@@ -5,15 +5,17 @@ const camundaRestResources = {
 };
 
 // -------------------------------------------------
-// ------------ camunda service -------------
+// ---------------- camunda service ----------------
 // -------------------------------------------------
 
-const camundaResponses: any[] = [];
-
-// const {
-//     Client,
-//     logger
-// } = require('camunda-external-task-client-js');
+const camundaResponses: {
+  msg: string,
+  when: Date
+}[] = [];
+const warehouseOrders: {
+  id: string,
+  sent: boolean
+}[] = [];
 
 import { Client, logger } from "camunda-external-task-client-js";
 
@@ -37,11 +39,64 @@ client.subscribe(
     if (firstName.length < 3 || lastName.length < 3)
       console.log("Error handling not implemented yet");
 
-    // camundaResponses.push({ msg: "To dobrze", when: new Date().toISOString() });
     await taskService.complete(task);
   }
 );
 
+client.subscribe(
+  'update-order-state-after-payment',
+  async ({ task, taskService }) => {
+    console.log('update-order-state-after-payment');
+    console.log('... brr, updating order state in some database');
+    console.log('... and sending notification to user');
+    camundaResponses.push({
+      msg: `payment has been accepted for order "${task.processInstanceId}" `,
+      when: new Date(), 
+    })
+    await taskService.complete(task);
+  })
+
+client.subscribe(
+  'send-order-to-warehouse',
+  async ({ task, taskService }) => {
+    console.log('send-order-to-warehouse');
+    console.log('... brr sending order to warehouse, and updating database');
+    let order = {
+      id: task.processInstanceId + '',
+      sent: false,
+    }
+    warehouseOrders.push(order);
+    // updating databse, maybe later
+    await taskService.complete(task);
+  })
+
+client.subscribe(
+  'update-order-state-after-shipment',
+  async ({ task, taskService }) => {
+    console.log('update-order-state-after-shipment');
+    console.log('... brr updating order state in database');
+
+    let order = warehouseOrders.find(order => order.id == task.processInstanceId);
+    if (order) {
+      console.log('... warehouse order marked as sent');
+      order.sent = true;
+    } else {
+      console.log('... couldnt not find warehouse order');
+    }
+
+    console.log('... and sending notification to user');
+    camundaResponses.push({
+      msg: `order has been sent, order id "${task.processInstanceId}"`,
+      when: new Date(),
+    });
+    await taskService.complete(task);
+  })
+
+  
+// -------------------------------------------------
+// -------------------- express --------------------
+//  (for interaction between frontend and camunda)
+//           (and hosting frontedn ofc)
 // -------------------------------------------------
 
 const PORT = 80;
@@ -61,6 +116,35 @@ app.get("/hello", function (req: any, res: any) {
 
 app.get("/messages", (req: any, res: any) => {
   res.send({ messages: camundaResponses });
+});
+
+app.get('/warehouse/orders', (req: any, res: any) => {
+  res.send({ orders: warehouseOrders });
+});
+
+app.post('/warehouse/realiseorder', async (req: any, res: any) => {
+  console.log('/warehouse/realiseorder');
+  
+  const payload = {
+    messageName: "orderSentConfirmation",
+    processInstanceId: req.body.id,
+    resultEnabled: true,
+  };
+  console.log(payload);
+
+  try {
+    const response = await got(camundaRestResources.message, {
+      method: "POST",
+      json: payload,
+      responseType: "json",
+    });
+    console.log(`orderSentConfirmation success`);
+    res.send({ id: req.body.id });
+  } catch (error) {
+    console.error('failed to orderSentConfirmation');
+    console.error(error);
+    res.status(500).send({ id: null });
+  }
 });
 
 app.get("/confirmCartContents", async (req: any, res: any) => {

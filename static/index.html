@@ -1,41 +1,78 @@
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <link
-      rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-      crossorigin="anonymous"
-    />
-    <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
-    <script src="index.js"></script>
-    <title>Poważny sklep internetowy</title>
-  </head>
-  <body class="container">
-    <div class="row">
-      <div class="col">
-        <div id="current-process-id"></div>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet"
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+        crossorigin="anonymous" />
+  <link rel="stylesheet"
+        type="text/css"
+        href="style.css"
+        media="screen" />
+  <script src="index.js"></script>
+  <title>Poważny sklep internetowy</title>
+</head>
+
+<body class="container">
+  <div class="row">
+    <div class="col">
+      <h3>Client Interface</h3>
+
+
+
+      <div class="row">
+        <div class="col">
+          <button class="btn"
+                  onClick="onConfirmCartContents()">
+            Confirm cart contents
+          </button>
+        </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="col">
-        <button class="btn" onClick="onConfirmCartContents()">
-          Confirm cart contents
-        </button>
+      <div class="row">
+        <form onsubmit="onSubmitClientData(event)"
+              class="form-inline">
+          <input class="form-control"
+                 name="firstName"
+                 placeholder="First name" />
+          <input class="form-control"
+                 name="lastName"
+                 placeholder="Last name" />
+          <button class="btn"
+                  type="submit">Submit client data</button>
+        </form>
       </div>
-    </div>
-    <div class="row">
-      <form onsubmit="onSubmitClientData(event)" class="form-inline">
-        <input class="form-control" name="firstName" placeholder="First name" />
-        <input class="form-control" name="lastName" placeholder="Last name" />
-        <button class="btn" type="submit">Submit client data</button>
-      </form>
-    </div>
-    <div class="row w-100 m-0">
-      <div class="col-12">
-        messages:
-        <div id="messages"></div>
+      <div class="row w-100 m-0">
+        <div class="col-12">
+          messages (client <-> process):
+            <div id="messages"></div>
+        </div>
       </div>
+
+
     </div>
-  </body>
+    <div class="col">
+      <h3>Warehouse Interface</h3>
+      <div class="row w-100 m-0">
+        <div class="col-12">
+
+          <button class="btn btn-info"
+                  onClick="getWarehouseOrders()">
+            refresh
+          </button>
+        </div>
+        <div class="col-12">
+          <div id="warehouse-orders">
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+
+
+</body>
+
 </html>
