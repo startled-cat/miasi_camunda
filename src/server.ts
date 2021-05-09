@@ -9,6 +9,11 @@ const camundaRestResources = {
 // -------------------------------------------------
 
 const camundaResponses: any[] = [];
+const warehouseOrders: {
+  id: string,
+  task: any,
+  sent: boolean
+}[] = [];
 
 // const {
 //     Client,
@@ -37,10 +42,54 @@ client.subscribe(
     if (firstName.length < 3 || lastName.length < 3)
       console.log("Error handling not implemented yet");
 
-    // camundaResponses.push({ msg: "To dobrze", when: new Date().toISOString() });
     await taskService.complete(task);
   }
 );
+
+client.subscribe(
+  'update-order-state-after-payment',
+  async ({ task, taskService }) => {
+    console.log('update-order-state-after-payment');
+    console.log(task);
+    console.log('... brr, updating orser state in some database');
+    console.log('... and sending notification to user');
+    await taskService.complete(task);
+  })
+
+client.subscribe(
+  'send-order-to-warehouse',
+  async ({ task, taskService }) => {
+    console.log('send-order-to-warehouse');
+    console.log(task);
+    console.log('... brr sending order to warehouse, and updating database');
+
+    let order = {
+      id: '',
+      task: task,
+      sent: false,
+    }
+    warehouseOrders.push(order);
+
+    await taskService.complete(task);
+  })
+
+client.subscribe(
+  'update-order-state-after-shipment',
+  async ({ task, taskService }) => {
+    console.log('update-order-state-after-shipment');
+    console.log(task);
+    console.log('... brr updating order state in database');
+
+    let order = warehouseOrders.find(order => order.task == task);
+    if (order) {
+      order.sent = true;
+    } else {
+      // umm, what happen
+    }
+
+    console.log('... and sending notification to user');
+    await taskService.complete(task);
+  })
 
 // -------------------------------------------------
 
@@ -61,6 +110,10 @@ app.get("/hello", function (req: any, res: any) {
 
 app.get("/messages", (req: any, res: any) => {
   res.send({ messages: camundaResponses });
+});
+
+app.get('/warehouseOrders', (req: any, res: any) => {
+  res.send({ orders: camundaResponses });
 });
 
 app.get("/confirmCartContents", async (req: any, res: any) => {
