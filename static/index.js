@@ -12,6 +12,7 @@ const shopResources = {
   submitClientData: shopUrl + 'submitClientData',
   messages: shopUrl + 'messages',
   payment: shopUrl + 'payment',
+  paymentProvider: shopUrl + 'payment/provider',
 
   warehouseOrders: shopUrl + 'warehouse/orders',
   warehouseRealiseOrder: shopUrl + 'warehouse/realiseorder',
@@ -81,6 +82,30 @@ function submitPaymentMethod() {
       console.warn('submitPaymentMethod > Error');
       console.warn(error);
     });
+}
+
+function submitPayment() {
+  setTimeout(() => {
+    const payload = {
+      id: localStorage.getItem('id'),
+      msg: 'Payment succeded!',
+    };
+
+    fetch(shopResources.paymentProvider, {
+      method: 'POST',
+      header: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
+      .then(() => {
+        console.log('submitPayment > Success');
+      })
+      .catch((error) => {
+        console.warn('submitPayment > Error');
+        console.warn(error);
+      });
+  }, 5000);
 }
 
 function getMessages() {
