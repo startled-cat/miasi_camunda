@@ -1,83 +1,161 @@
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <link
-      rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-      crossorigin="anonymous"
-    />
-    <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
-    <script src="index.js"></script>
-    <title>Poważny sklep internetowy</title>
-  </head>
 
-  <body class="container">
-    <div class="row">
-      <div class="col">
-        <h3>Client Interface</h3>
+<head>
+  <meta charset="UTF-8" />
 
-        <div class="row">
-          <div class="col">
-            <button class="btn" onClick="onConfirmCartContents()">
-              Confirm cart contents
-            </button>
-          </div>
-        </div>
-        <div class="row">
-          <form onsubmit="onSubmitClientData(event)" class="form-inline">
-            <input
-              class="form-control"
-              name="firstName"
-              placeholder="First name"
-            />
-            <input
-              class="form-control"
-              name="lastName"
-              placeholder="Last name"
-            />
-            <button class="btn" type="submit">Submit client data</button>
-          </form>
-        </div>
-        <div class="row">
-          <select class="form-select" id="paymentSelect" name="payment">
-            <option value="" disabled selected>Choose a payment method</option>
-            <option value="Blik">Blik</option>
-            <option value="Debit Card">Debit Card</option>
-            <option value="Credit Card">Credit Card</option>
-            <option value="Bank Transfer">Bank Transfer</option>
-            <option value="Upon receipt">Upon receipt</option>
-          </select>
-          <button class="btn" onclick="submitPaymentMethod()">
-            Submit payment method
-          </button>
-        </div>
-        <divclass="row">
-          <button class="btn" onclick="submitPayment()">
-            Pay
-          </button>
-        </div>
-        <div class="row w-100 m-0">
-          <div class="col-12">
-            messages (client <-> process):
-            <button onclick="getMessages()">refresh</button>
-            <div id="messages"></div>
-          </div>
-        </div>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0"
+        crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8"
+          crossorigin="anonymous"></script>
+
+  <link rel="stylesheet"
+        type="text/css"
+        href="style.css"
+        media="screen" />
+  <script src="index.js"></script>
+  <title>Poważny sklep internetowy</title>
+</head>
+
+<body class="container bg-dark text-light">
+  <div class="row">
+
+    <div class="col">
+      <h2>Client interface</h2>
+
+      <div id="order-id"></div>
+
+
+
+      <div id="client-step1">
+        <h4>Step 1 - confirm cart contents :</h4>
+
+        <img src="assets/cart.svg"
+             class="big-icon">
+        <br>
+
+        <button class="btn btn-primary"
+                id="button-confirmcart"
+                onClick="onConfirmCartContents()">
+          Confirm
+        </button>
       </div>
-      <div class="col">
-        <h3>Warehouse Interface</h3>
-        <div class="row w-100 m-0">
-          <div class="col-12">
-            <button class="btn btn-info" onClick="getWarehouseOrders()">
-              refresh
-            </button>
-          </div>
-          <div class="col-12">
-            <div id="warehouse-orders"></div>
-          </div>
-        </div>
+
+
+      <hr>
+
+      <div id="client-step2">
+
+        <h4>Step 2 - fill contact info:</h4>
+
+        <img src="assets/contact.svg"
+             class="big-icon">
+
+        <form onsubmit="onSubmitClientData(event)"
+              class="form-inline"
+              id="form-contact">
+          <input class="form-control"
+                 name="firstName"
+                 placeholder="First name"
+                 required />
+          <input class="form-control"
+                 name="lastName"
+                 placeholder="Last name"
+                 required />
+          <button class="btn btn-primary"
+                  type="submit">Submit</button>
+        </form>
       </div>
+
+
+
+
+      <hr>
+      <div id="client-step3">
+        <h4>Step 3 - choose payment method:</h4>
+
+        <img src="assets/payment.svg"
+             class="big-icon">
+        <br>
+
+        <select class="form-select "
+                id="paymentSelect"
+                name="payment"
+                required>
+          <option value=""
+                  disabled
+                  selected>Choose a payment method</option>
+          <option value="Blik">Blik</option>
+          <option value="Debit Card">Debit Card</option>
+          <option value="Credit Card">Credit Card</option>
+          <option value="Bank Transfer">Bank Transfer</option>
+          <option disabled
+                  value="Upon receipt">Upon receipt</option>
+        </select>
+        <button class="btn btn-primary"
+                id="button-payment"
+                onclick="submitPaymentMethod()">
+          Choose
+        </button>
+      </div>
+
+
+      <hr>
+
+      <div id="client-step4">
+        <h4>Step 4 - P A Y:</h4>
+
+        <img src="assets/send.svg"
+             class="big-icon">
+        <br>
+        <button class="btn btn-primary"
+                id="button-pay"
+                onclick="submitPayment()">
+          Pay
+        </button>
+        <div id="payment-state"></div>
+      </div>
+
+
+      <hr>
+      <div id="client-step5">
+
+        <h4>Step 5 - wait:</h4>
+
+        <img src="assets/shipping.svg"
+             class="big-icon">
+        <br>
+
+        <button class="btn btn-light"
+                id="button-getmessages"
+                onclick="getMessages('messages')">Refesh messages</button>
+        <p>
+        <h5>messages:</h5>
+        <div id="messages"></div>
+        </p>
+      </div>
+
+      <button class="btn btn-danger"
+              onclick="resetState()">
+        Reset
+      </button>
+
+
     </div>
-  </body>
+    <div class="col">
+      <h2>Warehouse interface</h2>
+      <button class="btn btn-info"
+              onClick="getWarehouseOrders()">
+        refresh
+      </button>
+      <div id="warehouse-orders"></div>
+    </div>
+  </div>
+
+
+</body>
+
 </html>
