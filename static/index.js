@@ -1,7 +1,7 @@
 window.addEventListener('load', () => {
   console.log('loaded');
 
-  setInterval(getMessages, 500);
+  //setInterval(getMessages, 500);
   getWarehouseOrders();
 });
 
@@ -27,6 +27,7 @@ function onConfirmCartContents() {
       localStorage.setItem('id', data.id);
       //document.getElementById('current-process-id').innerHTML = data.id;
       console.log('Success');
+      console.log(localStorage.getItem('id'));
     });
 }
 
@@ -50,7 +51,7 @@ function onSubmitClientData(e) {
     },
   }).then(() => {
     console.log('Success');
-    localStorage.removeItem('id');
+    //localStorage.removeItem('id');
   });
 }
 
@@ -67,6 +68,8 @@ function submitPaymentMethod() {
     id: localStorage.getItem('id'),
     paymentMethod: selectedValue,
   };
+  console.log('payload');
+  console.log(payload);
 
   fetch(shopResources.payment, {
     method: 'POST',
