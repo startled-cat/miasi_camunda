@@ -46,6 +46,8 @@ client.subscribe(
 client.subscribe(
   'update-order-state-after-payment',
   async ({ task, taskService }) => {
+    const providerMsg: String = task.variables.get('msg');
+    console.log(`Provider message ${providerMsg}`);
     console.log('update-order-state-after-payment');
     console.log('... brr, updating order state in some database');
     console.log('... and sending notification to user');
@@ -100,7 +102,9 @@ client.subscribe(
     const paymentMethod: String = task.variables.get('paymentMethod');
 
     console.log('redirect-client-to-payment-provider');
-    console.log(`... brr redirecting client to payment provider. Chosen method: ${paymentMethod}`);
+    console.log(
+      `... brr redirecting client to payment provider. Chosen method: ${paymentMethod}`
+    );
 
     await taskService.complete(task);
   }
@@ -207,10 +211,29 @@ app.post('/payment', async (req: any, res: any) => {
   }
 });
 
-app.post('/payment/status', (req: any, res: any) => {
-  let message = req.body.msg;
-  console.log(`Payment provider message: ${message}`);
-  res.status(200);
+app.post('/payment/provider', async (req: any, res: any) => {
+  const payload = {
+    messageName: 'paymentReceived',
+    processInstanceId: req.body.id,
+    processVariables: {
+      paymentProviderMessage: { value: req.body.msg, type: 'String' },
+    },
+    resultEnabled: true,
+  };
+
+  try {
+    await got(camundaRestResources.message, {
+      method: 'POST',
+      json: payload,
+      responseType: 'json',
+    });
+
+    console.log('Payment tamagucci');
+    res.status(200);
+  } catch (error) {
+    console.error('failed to submit payment method');
+    res.status(500);
+  }
 });
 
 app.post('/submitClientData', async (req: any, res: any) => {
