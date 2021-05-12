@@ -204,10 +204,11 @@ app.post('/payment', async (req: any, res: any) => {
     });
 
     console.log('Payment method submited');
-    res.status(200);
+    res.send({});
   } catch (error) {
     console.error('failed to submit payment method');
-    res.status(500);
+    console.error(error);
+    res.status(500).send({error: error});
   }
 });
 
@@ -229,10 +230,11 @@ app.post('/payment/provider', async (req: any, res: any) => {
     });
 
     console.log('Payment tamagucci');
-    res.status(200);
+    res.send({});
   } catch (error) {
     console.error('failed to submit payment method');
-    res.status(500);
+    console.error(error);
+    res.status(500).send({error: error});
   }
 });
 
@@ -257,7 +259,8 @@ app.post('/submitClientData', async (req: any, res: any) => {
     res.send({});
   } catch (error) {
     console.error('failed to submit client data');
-    res.status(500).send({});
+    console.error(error);
+    res.status(500).send({error: error});
   }
 });
 
