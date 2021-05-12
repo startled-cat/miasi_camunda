@@ -49,21 +49,27 @@ window.addEventListener('load', () => {
 
   //setInterval(getMessages, 500);
   getWarehouseOrders();
-
-  if (localStorage.getItem(STEP_STORAGE_KEY)) {
-    setCurrentStep(localStorage.getItem(STEP_STORAGE_KEY));
+  let prevstep = localStorage.getItem(STEP_STORAGE_KEY)
+  if (prevstep) {
+    console.log('restoring step', prevstep)
+    setCurrentStep(prevstep);
   } else {
+    console.log('starting step from 1');
     setCurrentStep(1);
   }
   updateOrderIdUi()
 });
 
 function updateOrderIdUi() {
-  document.getElementById('order-id').innerHTML = localStorage.getItem(ORDER_STORAGE_KEY);
+  if (localStorage.getItem(ORDER_STORAGE_KEY)) {
+    document.getElementById('order-id').innerHTML = 'order id: ' + localStorage.getItem(ORDER_STORAGE_KEY);
+
+  }
 
 }
 
 function resetState() {
+  console.log('resetState');
   localStorage.clear(ORDER_STORAGE_KEY);
   localStorage.clear(STEP_STORAGE_KEY);
   setCurrentStep(1);
@@ -72,6 +78,7 @@ function resetState() {
 }
 
 function advanceStep() {
+  console.log('advanceStep');
 
   if (currentStep >= 5) {
     return;
@@ -83,8 +90,8 @@ function advanceStep() {
 }
 
 function setCurrentStep(step) {
-
   console.log('setCurrentStep, step = ', step);
+  localStorage.setItem(STEP_STORAGE_KEY, currentStep);
 
   elementsInsideSteps.filter(e => e.step != step).forEach(s => {
     s.elements.forEach(element => element.disabled = true);
@@ -98,13 +105,14 @@ function setCurrentStep(step) {
   });
   document.getElementById(x.containerId).setAttribute('class', 'step-active');
 
-  localStorage.setItem(STEP_STORAGE_KEY, currentStep);
+  
 
   updateOrderIdUi();
 
 }
 
 function setStep(step, enable) {
+  console.log('setStep', step, enable);
   if (enable === true || enable === false) {
     let stepElement = elementsInsideSteps.find(s => s.step == step)
     stepElement.elements.forEach(element => {
@@ -171,7 +179,7 @@ function onSubmitClientData(e) {
 }
 
 function submitPaymentMethod() {
-  setStep(3, false);
+  
   let selectedValue = document.getElementById('paymentSelect').value;
 
   console.log(selectedValue);
@@ -186,7 +194,7 @@ function submitPaymentMethod() {
   };
   console.log('payload');
   console.log(payload);
-
+  setStep(3, false);
   fetch(shopResources.payment, {
       method: 'POST',
       headers: {
@@ -300,7 +308,7 @@ function getWarehouseOrders() {
           if (!order.sent) {
             html =
               html +
-              `<button class="btn" onClick="setOrderAsRealised('${order.id}')">mark as sent</button><br>`;
+              `<button class="btn btn-primary" onClick="setOrderAsRealised('${order.id}')">mark as sent</button><br>`;
           }
           orderElement.innerHTML = html;
           ordersContainer.appendChild(orderElement);

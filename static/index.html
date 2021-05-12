@@ -2,10 +2,16 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="stylesheet"
-        href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-        crossorigin="anonymous" />
+
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0"
+        crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8"
+          crossorigin="anonymous"></script>
+
   <link rel="stylesheet"
         type="text/css"
         href="style.css"
@@ -21,7 +27,7 @@
       <h2>Client interface</h2>
 
       <div id="order-id"></div>
-      
+
 
 
       <div id="client-step1">
@@ -31,7 +37,8 @@
              class="big-icon">
         <br>
 
-        <button class="btn" id="button-confirmcart"
+        <button class="btn btn-primary"
+                id="button-confirmcart"
                 onClick="onConfirmCartContents()">
           Confirm
         </button>
@@ -48,14 +55,17 @@
              class="big-icon">
 
         <form onsubmit="onSubmitClientData(event)"
-              class="form-inline" id="form-contact">
+              class="form-inline"
+              id="form-contact">
           <input class="form-control"
                  name="firstName"
-                 placeholder="First name" />
+                 placeholder="First name"
+                 required />
           <input class="form-control"
                  name="lastName"
-                 placeholder="Last name" />
-          <button class="btn"
+                 placeholder="Last name"
+                 required />
+          <button class="btn btn-primary"
                   type="submit">Submit</button>
         </form>
       </div>
@@ -69,10 +79,12 @@
 
         <img src="assets/payment.svg"
              class="big-icon">
+        <br>
 
-        <select class="form-select"
+        <select class="form-select "
                 id="paymentSelect"
-                name="payment">
+                name="payment"
+                required>
           <option value=""
                   disabled
                   selected>Choose a payment method</option>
@@ -80,9 +92,11 @@
           <option value="Debit Card">Debit Card</option>
           <option value="Credit Card">Credit Card</option>
           <option value="Bank Transfer">Bank Transfer</option>
-          <option value="Upon receipt">Upon receipt</option>
+          <option disabled
+                  value="Upon receipt">Upon receipt</option>
         </select>
-        <button class="btn" id="button-payment"
+        <button class="btn btn-primary"
+                id="button-payment"
                 onclick="submitPaymentMethod()">
           Choose
         </button>
@@ -96,11 +110,13 @@
 
         <img src="assets/send.svg"
              class="big-icon">
-
-        <button class="btn" id="button-pay"
+        <br>
+        <button class="btn btn-primary"
+                id="button-pay"
                 onclick="submitPayment()">
           Pay
         </button>
+        <div id="payment-state"></div>
       </div>
 
 
@@ -111,14 +127,19 @@
 
         <img src="assets/shipping.svg"
              class="big-icon">
+        <br>
 
-        <button class="btn" id="button-getmessages"
+        <button class="btn btn-light"
+                id="button-getmessages"
                 onclick="getMessages('messages')">Refesh messages</button>
-        messages:
+        <p>
+        <h5>messages:</h5>
         <div id="messages"></div>
+        </p>
       </div>
 
-      <button class="btn btn-danger" onclick="resetState()">
+      <button class="btn btn-danger"
+              onclick="resetState()">
         Reset
       </button>
 
