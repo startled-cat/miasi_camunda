@@ -254,12 +254,13 @@ function getMessages(destId) {
     .then((response) => response.json())
     .then((json) => {
       let messages = document.getElementById(destId);
-      messages.innerHTML = '';
+      messages.innerHTML = '<ul>';
       json.messages.forEach((m) => {
         let newMessage = document.createElement('div');
-        newMessage.innerHTML = `${new Date(m.when).toISOString()} : "${m.msg}"`;
+        newMessage.innerHTML = `<li>${new Date(m.when).toISOString()} : <b>"${m.msg}"</b><br> [${m.id}]</li>`;
         messages.appendChild(newMessage);
       });
+      messages.innerHTML = messages.innerHTML + '</ul>';
     })
     .catch((error) => {
       console.warn(error);
