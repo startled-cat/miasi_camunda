@@ -11,6 +11,7 @@ const camundaRestResources = {
 const camundaResponses: {
   msg: string;
   when: Date;
+  id: string;
 }[] = [];
 const warehouseOrders: {
   id: string;
@@ -52,8 +53,9 @@ client.subscribe(
     console.log('... brr, updating order state in some database');
     console.log('... and sending notification to user');
     camundaResponses.push({
-      msg: `payment has been accepted for order "${task.processInstanceId}" `,
+      msg: `payment has been accepted`,
       when: new Date(),
+      id: '' + task.processInstanceId,
     });
     await taskService.complete(task);
   }
@@ -89,8 +91,9 @@ client.subscribe(
 
     console.log('... and sending notification to user');
     camundaResponses.push({
-      msg: `order has been sent, order id "${task.processInstanceId}"`,
+      msg: `order has been sent`,
       when: new Date(),
+      id: '' + task.processInstanceId,
     });
     await taskService.complete(task);
   }
@@ -106,9 +109,42 @@ client.subscribe(
       `... brr redirecting client to payment provider. Chosen method: ${paymentMethod}`
     );
 
+
+
+
     await taskService.complete(task);
   }
 );
+
+
+
+//delays
+
+client.subscribe(
+  'realization_delay_notification',
+  async ({ task, taskService }) => {
+
+    console.log('realization_delay_notification');
+    console.log('... brr order realization is delayed, notify client');
+
+    //might use later
+    // let order = warehouseOrders.find(
+    //   (order) => order.id == task.processInstanceId
+    // );
+
+    // what is this
+    const providerMsg: String = task.variables.get('msg');
+    console.log(`Provider message ${providerMsg}`);;
+    camundaResponses.push({
+      msg: `DELAY, order realization is delayed, please be patient`,
+      when: new Date(),
+      id: '' + task.processInstanceId,
+    });
+
+    await taskService.complete(task);
+
+
+  })
 
 // -------------------------------------------------
 // -------------------- express --------------------
@@ -208,7 +244,7 @@ app.post('/payment', async (req: any, res: any) => {
   } catch (error) {
     console.error('failed to submit payment method');
     console.error(error);
-    res.status(500).send({error: error});
+    res.status(500).send({ error: error });
   }
 });
 
@@ -234,7 +270,7 @@ app.post('/payment/provider', async (req: any, res: any) => {
   } catch (error) {
     console.error('failed to submit payment method');
     console.error(error);
-    res.status(500).send({error: error});
+    res.status(500).send({ error: error });
   }
 });
 
@@ -260,7 +296,7 @@ app.post('/submitClientData', async (req: any, res: any) => {
   } catch (error) {
     console.error('failed to submit client data');
     console.error(error);
-    res.status(500).send({error: error});
+    res.status(500).send({ error: error });
   }
 });
 
