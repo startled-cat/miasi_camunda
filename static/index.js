@@ -95,14 +95,14 @@ function advanceStep() {
     return;
   }
 
-  currentStep += 1;
+  currentStep = Number(currentStep) + 1;
   setCurrentStep(currentStep);
 
 }
 
 function setCurrentStep(step) {
   console.log('setCurrentStep, step = ', step);
-  localStorage.setItem(STEP_STORAGE_KEY, step);
+  localStorage.setItem(STEP_STORAGE_KEY, Number(step));
   currentStep = step;
 
   elementsInsideSteps.filter(e => e.step != step).forEach(s => {
