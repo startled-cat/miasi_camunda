@@ -5,6 +5,11 @@ const camundaRestResources = {
   processInstance: CAMUNDA_REST_URL + '/process-instance',
 };
 
+export interface PaymentProcess {
+  id: string;
+  running: boolean;
+}
+var paymentProcesses: PaymentProcess[] = [];
 
 export interface UserDataValidation {
   id: string;
@@ -39,7 +44,7 @@ const client = new Client(config);
 client.subscribe(
   'validate-client-data',
   async function ({ task, taskService }) {
-    let validation: UserDataValidation
+    let validation: UserDataValidation;
 
     const firstName: String = task.variables.get('firstName');
     const lastName: String = task.variables.get('lastName');
@@ -56,7 +61,6 @@ client.subscribe(
       userDataValidation.push(validation);
       await taskService.complete(task);
     }
-
   }
 );
 
@@ -120,6 +124,11 @@ client.subscribe(
   async ({ task, taskService }) => {
     const paymentMethod: String = task.variables.get('paymentMethod');
 
+    let paymentProcess: PaymentProcess;
+
+    paymentProcess = { id: '' + task.processInstanceId, running: true };
+    paymentProcesses.push(paymentProcess);
+
     console.log('redirect-client-to-payment-provider');
     console.log(
       `... brr redirecting client to payment provider. Chosen method: ${paymentMethod}`
@@ -129,15 +138,24 @@ client.subscribe(
   }
 );
 
-client.subscribe(
-  'cancel-the-order',
-  async ({ task, taskService }) => {
-    console.log('cancel-the-order');
-    console.log('... brr time for payment has passed, canceling order...');
-    
-    await taskService.complete(task);
-  }
-);
+client.subscribe('cancel-the-order', async ({ task, taskService }) => {
+  console.log('cancel-the-order');
+  console.log('... brr time for payment has passed, canceling order...');
+
+  // Find process with the same id
+  let processIndex = paymentProcesses.findIndex(
+    (obj) => obj.id === task.processInstanceId
+  );
+  let paymentProcess = paymentProcesses[processIndex];
+
+  // Change the state of process
+  paymentProcess.running = false;
+
+  // Update the list
+  paymentProcesses[processIndex] = paymentProcess;
+
+  await taskService.complete(task);
+});
 
 //delays
 
@@ -165,22 +183,18 @@ client.subscribe(
   }
 );
 
-client.subscribe(
-  'cancel-order-notification',
-  async ({task, taskService}) => {
-    console.log('cancel-order-notification');
-    console.log('... brr order has been canceled, notify client');
+client.subscribe('cancel-order-notification', async ({ task, taskService }) => {
+  console.log('cancel-order-notification');
+  console.log('... brr order has been canceled, notify client');
 
-    camundaResponses.push({
-      msg: 'Order has been canceled',
-      when: new Date(),
-      id: '' + task.processInstanceId,
-    });
-  
-    
-    await taskService.complete(task);  
-  }
-)
+  camundaResponses.push({
+    msg: 'Order has been canceled',
+    when: new Date(),
+    id: '' + task.processInstanceId,
+  });
+
+  await taskService.complete(task);
+});
 
 // -------------------------------------------------
 // -------------------- express --------------------
@@ -342,27 +356,51 @@ app.post('/isuserdatavalidated', (req, res) => {
   console.log(userDataValidation);
   console.log('processInstanceId = ', processInstanceId);
 
-  let validation/*:UserDataValidation*/ = userDataValidation.find(v => v.id === processInstanceId);
+  let validation /*:UserDataValidation*/ = userDataValidation.find(
+    (v) => v.id === processInstanceId
+  );
 
   if (validation) {
-
     if (validation.valid) {
-      res.status(200).send({ valid: true })
+      res.status(200).send({ valid: true });
     } else if (!validation.valid) {
-      res.status(400).send({ valid: false })
+      res.status(400).send({ valid: false });
     }
 
     //clear entry
-    userDataValidation = userDataValidation.filter(v => v.id !== processInstanceId);
-
+    userDataValidation = userDataValidation.filter(
+      (v) => v.id !== processInstanceId
+    );
   } else {
     res.status(500).send(null);
-
   }
+});
 
+app.post('/paymentprocess', (req, res) => {
+  let processInstanceId = req.body.id;
 
+  console.log(paymentProcesses);
+  console.log('processInstanceId = ', processInstanceId);
 
-})
+  let paymentProcess = paymentProcesses.find(
+    (obj) => obj.id === processInstanceId
+  );
+
+  if (paymentProcess) {
+    if (paymentProcess.running) {
+      res.status(200).send({ running: true });
+    } else if (!paymentProcess.running) {
+      res.status(400).send({ running: false });
+      // Clear processes
+      paymentProcesses = paymentProcesses.filter(
+        (obj) => obj.id !== processInstanceId
+      );
+    }
+  } else {
+    res.status(500).send(null);
+  }
+});
+
 app.post('/reset', async (req: any, res: any) => {
   try {
     await got(`${camundaRestResources.processInstance}/${req.body.id}`, {
