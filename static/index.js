@@ -12,6 +12,8 @@ const shopResources = {
 
   warehouseOrders: shopUrl + 'warehouse/orders',
   warehouseRealiseOrder: shopUrl + 'warehouse/realiseorder',
+
+  isuserdatavalidated: shopUrl + 'isuserdatavalidated',
 };
 
 
@@ -71,7 +73,8 @@ function updateOrderIdUi() {
 function resetState() {
   console.log('resetState');
   localStorage.clear(ORDER_STORAGE_KEY);
-  localStorage.clear(STEP_STORAGE_KEY);
+  //localStorage.clear(STEP_STORAGE_KEY);
+  localStorage.setItem(STEP_STORAGE_KEY, 1);//why
   setCurrentStep(1);
   updateOrderIdUi();
 
@@ -105,7 +108,7 @@ function setCurrentStep(step) {
   });
   document.getElementById(x.containerId).setAttribute('class', 'step-active');
 
-  
+
 
   updateOrderIdUi();
 
@@ -148,7 +151,7 @@ function onConfirmCartContents() {
     });
 }
 
-function onSubmitClientData(e) {
+async function onSubmitClientData(e) {
   setStep(2, false);
   console.log('onSubmitClientData');
   e.preventDefault();
@@ -168,9 +171,51 @@ function onSubmitClientData(e) {
       'Content-Type': 'application/json',
     },
   }).then(() => {
-    console.log('Success');
+    console.log('Success, data sent');
 
-    advanceStep();
+    setTimeout(() => {
+
+
+      // check if data validated
+      fetch(shopResources.isuserdatavalidated, {
+        method: 'POST',
+        body: JSON.stringify({
+          id: localStorage.getItem(ORDER_STORAGE_KEY)
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }).then((response) => {
+
+        console.log(response.status);
+
+        //if valid (200)
+        if(response.status == 200){
+          advanceStep();
+        }
+
+        //if 400 then not valid
+        if(response.status == 400){
+          console.log('user data not valid');
+          setStep(2, true);
+        }
+
+
+        //if 500 then not yet validated
+        // repeat request somehow
+
+      }).catch((error) => {
+        // not validated yet
+        console.error(error);
+      })
+
+      
+
+
+
+    }, 1000);
+
+
 
   }).catch((error) => {
     console.error(error);
@@ -179,7 +224,7 @@ function onSubmitClientData(e) {
 }
 
 function submitPaymentMethod() {
-  
+
   let selectedValue = document.getElementById('paymentSelect').value;
 
   console.log(selectedValue);
