@@ -14,6 +14,7 @@ const shopResources = {
   warehouseRealiseOrder: shopUrl + 'warehouse/realiseorder',
 
   isuserdatavalidated: shopUrl + 'isuserdatavalidated',
+  reset: shopUrl + 'reset',
 };
 
 
@@ -71,13 +72,20 @@ function updateOrderIdUi() {
 }
 
 function resetState() {
+  fetch(shopResources.reset, {
+    method: 'POST',
+    body: JSON.stringify({ id: localStorage.getItem(ORDER_STORAGE_KEY) }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
   console.log('resetState');
   localStorage.clear(ORDER_STORAGE_KEY);
   //localStorage.clear(STEP_STORAGE_KEY);
   localStorage.setItem(STEP_STORAGE_KEY, 1);//why
   setCurrentStep(1);
   updateOrderIdUi();
-
 }
 
 function advanceStep() {

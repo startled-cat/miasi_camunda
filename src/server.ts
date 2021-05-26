@@ -2,6 +2,7 @@ const CAMUNDA_REST_URL = 'http://localhost:8080/engine-rest';
 
 const camundaRestResources = {
   message: CAMUNDA_REST_URL + '/message',
+  processInstance: CAMUNDA_REST_URL + '/process-instance',
 };
 
 
@@ -49,7 +50,7 @@ client.subscribe(
     if (firstName.length < 3 || lastName.length < 3) {
       validation = { id: '' + task.processInstanceId, valid: false };
       userDataValidation.push(validation);
-      await taskService.handleBpmnError(task, "validationError");
+      await taskService.handleBpmnError(task, 'validationError');
     } else {
       validation = { id: '' + task.processInstanceId, valid: true };
       userDataValidation.push(validation);
@@ -335,6 +336,19 @@ app.post('/isuserdatavalidated', (req, res) => {
 
 
 })
+app.post('/reset', async (req: any, res: any) => {
+  try {
+    await got(`${camundaRestResources.processInstance}/${req.body.id}`, {
+      method: 'DELETE',
+    });
+    console.log('instance force stopped');
+    res.send({});
+  } catch (error) {
+    console.error('failed to force stop instance');
+    console.error(error);
+    res.status(500).send({ error: error });
+  }
+});
 
 const server = app.listen(PORT, function () {
   console.log(`frontend listening at ${PORT}`);
