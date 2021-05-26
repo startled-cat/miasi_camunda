@@ -66,7 +66,8 @@ window.addEventListener('load', () => {
 function updateOrderIdUi() {
   if (localStorage.getItem(ORDER_STORAGE_KEY)) {
     document.getElementById('order-id').innerHTML = 'order id: ' + localStorage.getItem(ORDER_STORAGE_KEY);
-
+  }else{
+    document.getElementById('order-id').innerHTML = '';
   }
 
 }
@@ -74,7 +75,9 @@ function updateOrderIdUi() {
 function resetState() {
   fetch(shopResources.reset, {
     method: 'POST',
-    body: JSON.stringify({ id: localStorage.getItem(ORDER_STORAGE_KEY) }),
+    body: JSON.stringify({
+      id: localStorage.getItem(ORDER_STORAGE_KEY)
+    }),
     headers: {
       'Content-Type': 'application/json',
     },
@@ -82,10 +85,7 @@ function resetState() {
 
   console.log('resetState');
   localStorage.clear(ORDER_STORAGE_KEY);
-  //localStorage.clear(STEP_STORAGE_KEY);
-  localStorage.setItem(STEP_STORAGE_KEY, 1);//why
   setCurrentStep(1);
-  updateOrderIdUi();
 }
 
 function advanceStep() {
@@ -102,7 +102,8 @@ function advanceStep() {
 
 function setCurrentStep(step) {
   console.log('setCurrentStep, step = ', step);
-  localStorage.setItem(STEP_STORAGE_KEY, currentStep);
+  localStorage.setItem(STEP_STORAGE_KEY, step);
+  currentStep = step;
 
   elementsInsideSteps.filter(e => e.step != step).forEach(s => {
     s.elements.forEach(element => element.disabled = true);
@@ -198,12 +199,12 @@ async function onSubmitClientData(e) {
         console.log(response.status);
 
         //if valid (200)
-        if(response.status == 200){
+        if (response.status == 200) {
           advanceStep();
         }
 
         //if 400 then not valid
-        if(response.status == 400){
+        if (response.status == 400) {
           console.log('user data not valid');
           setStep(2, true);
         }
@@ -217,7 +218,7 @@ async function onSubmitClientData(e) {
         console.error(error);
       })
 
-      
+
 
 
 
