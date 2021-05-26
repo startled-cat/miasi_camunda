@@ -379,9 +379,6 @@ app.post('/isuserdatavalidated', (req, res) => {
 app.post('/paymentprocess', (req, res) => {
   let processInstanceId = req.body.id;
 
-  console.log(paymentProcesses);
-  console.log('processInstanceId = ', processInstanceId);
-
   let paymentProcess = paymentProcesses.find(
     (obj) => obj.id === processInstanceId
   );
