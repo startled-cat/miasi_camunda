@@ -15,6 +15,8 @@ const shopResources = {
 
   isuserdatavalidated: shopUrl + 'isuserdatavalidated',
   reset: shopUrl + 'reset',
+
+  paymentprocess: shopUrl + 'paymentprocess',
 };
 
 
@@ -46,6 +48,8 @@ const elementsInsideSteps = [{
   },
 ]
 
+var checkInterval;
+
 
 window.addEventListener('load', () => {
   console.log('loaded');
@@ -73,6 +77,7 @@ function updateOrderIdUi() {
 }
 
 function resetState() {
+  clearInterval(checkInterval);
   fetch(shopResources.reset, {
     method: 'POST',
     body: JSON.stringify({
@@ -261,12 +266,37 @@ function submitPaymentMethod() {
 
       advanceStep();
 
+      checkInterval = setInterval(checkPaymentProcess, 500);
     })
     .catch((error) => {
       console.warn('submitPaymentMethod > Error');
       console.warn(error);
       setStep(3, true);
     });
+}
+
+function checkPaymentProcess() {
+  const payload = {
+    id: localStorage.getItem(ORDER_STORAGE_KEY),
+  }
+
+  fetch(shopResources.paymentprocess, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload),
+  })
+  .then((response) => { 
+    if (response.status == 400) {
+      console.log("Payment has been canceled");
+      resetState();
+      alert("Payment has been canceled");
+    }
+  }).catch((error) => {
+    console.error(error);
+    setStep(3, true);
+  });
 }
 
 function submitPayment() {
@@ -292,7 +322,7 @@ function submitPayment() {
         console.log('submitPayment > Success');
         document.getElementById('payment-state').innerHTML = 'Payment successful';
         advanceStep();
-
+        clearInterval(checkInterval);
       })
       .catch((error) => {
         console.warn('submitPayment > Error');
