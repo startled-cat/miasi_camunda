@@ -38,7 +38,7 @@ client.subscribe(
     console.log(`Validating last name: "${lastName}"`);
 
     if (firstName.length < 3 || lastName.length < 3)
-      console.log('Error handling not implemented yet');
+      await taskService.handleBpmnError(task, "validationError");
 
     await taskService.complete(task);
   }
@@ -109,21 +109,15 @@ client.subscribe(
       `... brr redirecting client to payment provider. Chosen method: ${paymentMethod}`
     );
 
-
-
-
     await taskService.complete(task);
   }
 );
-
-
 
 //delays
 
 client.subscribe(
   'realization_delay_notification',
   async ({ task, taskService }) => {
-
     console.log('realization_delay_notification');
     console.log('... brr order realization is delayed, notify client');
 
@@ -134,7 +128,7 @@ client.subscribe(
 
     // what is this
     const providerMsg: String = task.variables.get('msg');
-    console.log(`Provider message ${providerMsg}`);;
+    console.log(`Provider message ${providerMsg}`);
     camundaResponses.push({
       msg: `DELAY, order realization is delayed, please be patient`,
       when: new Date(),
@@ -142,9 +136,8 @@ client.subscribe(
     });
 
     await taskService.complete(task);
-
-
-  })
+  }
+);
 
 // -------------------------------------------------
 // -------------------- express --------------------
