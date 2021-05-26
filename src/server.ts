@@ -129,6 +129,16 @@ client.subscribe(
   }
 );
 
+client.subscribe(
+  'cancel-the-order',
+  async ({ task, taskService }) => {
+    console.log('cancel-the-order');
+    console.log('... brr time for payment has passed, canceling order...');
+    
+    await taskService.complete(task);
+  }
+);
+
 //delays
 
 client.subscribe(
@@ -154,6 +164,23 @@ client.subscribe(
     await taskService.complete(task);
   }
 );
+
+client.subscribe(
+  'cancel-order-notification',
+  async ({task, taskService}) => {
+    console.log('cancel-order-notification');
+    console.log('... brr order has been canceled, notify client');
+
+    camundaResponses.push({
+      msg: 'Order has been canceled',
+      when: new Date(),
+      id: '' + task.processInstanceId,
+    });
+  
+    
+    await taskService.complete(task);  
+  }
+)
 
 // -------------------------------------------------
 // -------------------- express --------------------
