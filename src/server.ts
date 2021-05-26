@@ -5,6 +5,13 @@ const camundaRestResources = {
   processInstance: CAMUNDA_REST_URL + '/process-instance',
 };
 
+
+export interface UserDataValidation {
+  id: string;
+  valid: boolean;
+}
+var userDataValidation: UserDataValidation[] = [];
+
 // -------------------------------------------------
 // ---------------- camunda service ----------------
 // -------------------------------------------------
@@ -32,16 +39,24 @@ const client = new Client(config);
 client.subscribe(
   'validate-client-data',
   async function ({ task, taskService }) {
+    let validation: UserDataValidation
+
     const firstName: String = task.variables.get('firstName');
     const lastName: String = task.variables.get('lastName');
 
     console.log(`Validating first name: "${firstName}"`);
     console.log(`Validating last name: "${lastName}"`);
 
-    if (firstName.length < 3 || lastName.length < 3)
+    if (firstName.length < 3 || lastName.length < 3) {
+      validation = { id: '' + task.processInstanceId, valid: false };
+      userDataValidation.push(validation);
       await taskService.handleBpmnError(task, 'validationError');
+    } else {
+      validation = { id: '' + task.processInstanceId, valid: true };
+      userDataValidation.push(validation);
+      await taskService.complete(task);
+    }
 
-    await taskService.complete(task);
   }
 );
 
@@ -294,6 +309,33 @@ app.post('/submitClientData', async (req: any, res: any) => {
   }
 });
 
+app.post('/isuserdatavalidated', (req, res) => {
+  let processInstanceId = req.body.id;
+
+  console.log(userDataValidation);
+  console.log('processInstanceId = ', processInstanceId);
+
+  let validation/*:UserDataValidation*/ = userDataValidation.find(v => v.id === processInstanceId);
+
+  if (validation) {
+
+    if (validation.valid) {
+      res.status(200).send({ valid: true })
+    } else if (!validation.valid) {
+      res.status(400).send({ valid: false })
+    }
+
+    //clear entry
+    userDataValidation = userDataValidation.filter(v => v.id !== processInstanceId);
+
+  } else {
+    res.status(500).send(null);
+
+  }
+
+
+
+})
 app.post('/reset', async (req: any, res: any) => {
   try {
     await got(`${camundaRestResources.processInstance}/${req.body.id}`, {
